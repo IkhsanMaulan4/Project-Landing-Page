@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-padang-cream text-padang-text;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold;
+  }
+}
+
+@layer utilities {
+  .gradient-hero {
+    background: linear-gradient(135deg, #DC2626 0%, #F97316 100%);
+  }
+
+  .gradient-cta {
+    background: linear-gradient(135deg, #78350F 0%, #DC2626 100%);
+  }
+}
