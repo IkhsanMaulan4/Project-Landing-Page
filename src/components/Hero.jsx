@@ -1,6 +1,34 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { getProducts } from '../services/contentful';
 
 const Hero = () => {
+  const [heroImage, setHeroImage] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchHeroImage = async () => {
+      try {
+        const products = await getProducts();
+        // Cari produk Rendang untuk hero image
+        const rendangProduct = products.find(
+          product => product.fields.name?.toLowerCase().includes('rendang')
+        );
+
+        if (rendangProduct && rendangProduct.fields.image) {
+          const imageUrl = rendangProduct.fields.image.fields.file.url;
+          setHeroImage(imageUrl.startsWith('//') ? `https:${imageUrl}` : imageUrl);
+        }
+      } catch (error) {
+        console.error('Error loading hero image:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHeroImage();
+  }, []);
+
   return (
     <section id="hero" className="gradient-hero min-h-screen flex items-center pt-20">
       <div className="container mx-auto px-4">
@@ -43,14 +71,20 @@ const Hero = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="relative"
           >
-            <img
-              src="/public/images/products/bundle_ayam_bakar.png"
-              alt="Nasi Padang Froyow"
-              className="rounded-3xl shadow-2xl w-full h-[500px] object-cover"
-              onError={(e) => {
-                e.target.src = "https://images.unsplash.com/photo-1596040033229-a0b3b1c42a39?w=800&h=800&fit=crop";
-              }}
-            />
+            {loading ? (
+              <div className="rounded-3xl shadow-2xl w-full h-[500px] bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-white"></div>
+              </div>
+            ) : (
+              <img
+                src={heroImage || "https://images.unsplash.com/photo-1596040033229-a0b3b1c42a39?w=800&h=800&fit=crop"}
+                alt="Nasi Padang Froyow - Bundle Rendang"
+                className="rounded-3xl shadow-2xl w-full h-[500px] object-cover"
+                onError={(e) => {
+                  e.target.src = "https://images.unsplash.com/photo-1596040033229-a0b3b1c42a39?w=800&h=800&fit=crop";
+                }}
+              />
+            )}
             <div className="absolute -bottom-6 -left-6 bg-padang-gold text-padang-brown px-6 py-4 rounded-2xl shadow-xl">
               <p className="text-3xl font-bold">⭐ 4.9/5</p>
               <p className="text-sm">1000+ Pelanggan Puas</p>
